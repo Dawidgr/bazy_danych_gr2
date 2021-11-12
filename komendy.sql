@@ -173,6 +173,7 @@ create table zwierz (
 	nazwa varchar(40),
 	wiek int);
 	#f)
+<<<<<<< HEAD
 insert into zwierz select id_postaci, nazwa, wiek from postac where rodzaj in ('ptak','waz');
 
 #lab 05
@@ -456,3 +457,6 @@ select distinct rodzaj from zasob where nazwa like 'Ba%' or nazwa like '%os' ord
 #+----------+
 #| jedzenie |
 #+----------+
+=======
+insert into zwierz select id_postaci, nazwa, wiek from postac where rodzaj in ('ptak','waz');
+>>>>>>> 3cdaa88a44728bb4b1e44c8981fe3a74ed7b8c4c
