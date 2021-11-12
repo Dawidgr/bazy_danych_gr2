@@ -90,7 +90,7 @@ alter table postac add column funkcja varchar(40);
 update postac set funkcja='kapitan' where nazwa='Bjorn';
 	#6.
 alter table postac add column postac_statek varchar(40);
-alter table postac add CONSTRAINT 'postac_ibfk_1' foreign key (postac_statek) references statek(nazwa_statku);
+alter table postac add foreign key (postac_statek) references statek(nazwa_statku);
 	#7.
 update postac set postac_statek='Boar' where id_postaci=1;
 update postac set postac_statek='Boar' where id_postaci=2;
@@ -105,7 +105,7 @@ delete from izba where nazwa_izby='spizarnia';
 drop table izba;
 
 
-#lab 04
+# lab 04
 # Zadanie 1
 	#a) 
 #select nazwa, wiek from postac order by wiek DESC;
@@ -117,19 +117,28 @@ alter table postac modify id_postaci int not null;
 #SET foreign_key_checks = 0;
 #usuwanie klucza obcego
 #ALTER TABLE walizka/przetwory/itd. DROP FOREIGN KEY ..._ibfk_...;
-ALTER TABLE postac DROP FOREIGN KEY postac_ibfk_1;
+ALTER TABLE walizka DROP FOREIGN KEY walizka_ibfk_1;
+ALTER TABLE walizka DROP id_wlasciciela;
+ALTER TABLE przetwory DROP FOREIGN KEY przetwory_ibfk_1;
+ALTER TABLE przetwory DROP FOREIGN KEY przetwory_ibfk_2;
+ALTER TABLE przetwory DROP id_konsumenta;
+ALTER TABLE przetwory DROP id_wykonawcy;
 #możemy spróbować usunąć klucz główny
-#ALTER TABLE postac DROP Primary key;
+ALTER TABLE postac DROP Primary key;
 # Zadanie 2
-	#a)
-alter table postac add column pesel char(11) primary key;
-	#b)
+ALTER TABLE postac ADD COLUMN pesel char(11);
+update postac set pesel='46848912612' where id_postaci=1;
+update postac set pesel='68468418294' where id_postaci=2;
+update postac set pesel='98271968011' where id_postaci=3;
+update postac set pesel='92586259498' where id_postaci=5;
+update postac set pesel='78551673418' where id_postaci=6;
+update postac set pesel='97812371303' where id_postaci=8;
+ALTER TABLE postac ADD PRIMARY KEY(pesel);
 alter table postac modify rodzaj enum('wiking','ptak','kobieta','syrena');
-insert into postac 
-	(default,'Gertruda Nieszczera','syrena','1974-04-26',51);
+insert into postac values
+	(4,'Gertruda Nieszczera','syrena','1974-04-26',51,default,default,48915679456);
 # Zadanie 3
 	#a)
-#SELECT nazwa from postac WHERE nazwa LIKE '%a%';
 update postac set postac_statek='Boar' where nazwa like '%a%';
 	#b)
 update statek set max_ladownosc=max_ladownosc*0.7 where data_wodowania between '1901-01-01' AND '2000-12-31';
@@ -137,26 +146,31 @@ update statek set max_ladownosc=max_ladownosc*0.7 where data_wodowania between '
 alter table postac add check (wiek<1000);
 # Zadanie 4
 	#a)
+alter table postac modify rodzaj enum('wiking','ptak','kobieta','syrena','waz');
 insert into postac values
-	(default,'waz Loko','1525-03-04','500',null,null);
+	(7,'Loko','waz','1525-03-04','500',default,default,18915647854);
 	#b)
-#create table marynarz like postac;
 create table marynarz select * from postac where postac_statek is not null;
 	#c)
-	td
+alter table marynarz add primary key(pesel);
+alter table marynarz add foreign key(postac_statek) references statek(nazwa_statku);
 # Zadanie 5
 	#a)
 update postac set postac_statek=null;
 	#b)
 delete from postac where nazwa='Gil';
 	#c)
+alter table postac drop foreign key postac_ibfk_1;
+alter table postac drop column postac_statek;
+alter table marynarz drop foreign key marynarz_ibfk_1;
+alter table marynarz drop column postac_statek;
 delete from statek;
 	#d)
 drop table statek;
 	#e)
-create table zwierz(
+create table zwierz (
 	id int primary key auto_increment,
 	nazwa varchar(40),
 	wiek int);
 	#f)
-insert into zwierz select id_postaci, nazwa, wiek from postac;
+insert into zwierz select id_postaci, nazwa, wiek from postac where rodzaj in ('ptak','waz');
