@@ -459,4 +459,3 @@ select distinct rodzaj from zasob where nazwa like 'Ba%' or nazwa like '%os' ord
 #+----------+
 =======
 insert into zwierz select id_postaci, nazwa, wiek from postac where rodzaj in ('ptak','waz');
->>>>>>> 3cdaa88a44728bb4b1e44c8981fe3a74ed7b8c4c
