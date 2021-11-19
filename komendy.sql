@@ -459,3 +459,188 @@ select distinct rodzaj from zasob where nazwa like 'Ba%' or nazwa like '%os' ord
 #+----------+
 =======
 insert into zwierz select id_postaci, nazwa, wiek from postac where rodzaj in ('ptak','waz');
+#lab 06
+	# avg() - srednia
+	# count() - zlicza ilosc elementow
+	# sum() - suma wartosci (liczbowych)
+	# min() - minimum
+	# max() - maksimum
+#SELECT round(avg(udzwig), 0) from kreatura;
+#SELECT floor(avg(udzwig)) from kreatura;
+#SELECT ceil(avg(udzwig)) from kreatura;
+#Zadanie 1
+	#1.
+SELECT AVG(waga) from kreatura where rodzaj='wiking';
+#+-----------+
+#| AVG(waga) |
+#+-----------+
+#|   95.1111 |
+#+-----------+
+	#2.
+SELECT rodzaj, AVG(waga), count(nazwa) from kreatura group by rodzaj;
+#+---------+-----------+--------------+
+#| rodzaj  | AVG(waga) | count(nazwa) |
+#+---------+-----------+--------------+
+#| wiking  |   95.1111 |            9 |
+#| ryba    | 1050.5000 |            2 |
+#| waz     |    3.0000 |            1 |
+#| ptak    |    2.0000 |            2 |
+#| wiedzma |   41.2500 |            4 |
+#| malpa   |   32.0000 |            1 |
+#+---------+-----------+--------------+
+	#3.   now() or curdata()
+SELECT AVG(year(curdate())-year(dataUr)) as 'sredni wiek kreatur' FROM kreatura;
+#+---------------------+
+#| sredni wiek kreatur |
+#+---------------------+
+#|            386.7895 |
+#+---------------------+
+
+#Zadanie 2.
+	#1.
+SELECT rodzaj, SUM(waga) as 'waga' FROM zasob GROUP BY rodzaj;
++--------------------+--------+
+| rodzaj             | waga   |
++--------------------+--------+
+| jedzenie           | 130.00 |
+| narzedzie          |  13.00 |
+| NULL               |   9.10 |
+| ubranie            |  33.10 |
+| narzedzie zbrodni  |   6.00 |
+| material budowlany |   0.60 |
+| miejsce wypoczynku |   4.00 |
++--------------------+--------+
+	#2. błąd w tresci zadania, ma być avg, nie suma.
+SELECT nazwa, AVG(waga) FROM zasob where ilosc >=4 GROUP BY nazwa HAVING avg(waga)>10;
++---------------+-----------+
+| nazwa         | AVG(waga) |
++---------------+-----------+
+| skora geparda | 30.000000 |
++---------------+-----------+
+	#3.
+SELECT rodzaj, count(distinct nazwa) from zasob group by rodzaj having sum(ilosc)>1;
+	#lub where ilosc > 1
++--------------------+-----------------------+
+| rodzaj             | count(distinct nazwa) |
++--------------------+-----------------------+
+| NULL               |                     4 |
+| jedzenie           |                     6 |
+| material budowlany |                     2 |
+| miejsce wypoczynku |                     2 |
+| narzedzie zbrodni  |                     3 |
+| ubranie            |                     4 |
++--------------------+-----------------------+
+
+#Zadanie 3	#mozna uzywac np k.nazwa zamiast kreatura.nazwa jako skrot
+	#1.
+#select * from kreatura, ekwipunek where kreatura.idKreatury=ekwipunek.idKreatury;
+	#lub uzywajac inner join
+#select * from kreatura inner join ekwipunek ON kreatura.idKreatury=ekwipunek.idKreatury;
+select nazwa, sum(ilosc) from kreatura inner join ekwipunek ON kreatura.idKreatury=ekwipunek.idKreatury group by kreatura.idKreatury;
++-----------+------------+
+| nazwa     | sum(ilosc) |
++-----------+------------+
+| Bjorn     |         64 |
+| Brutal    |          4 |
+| Astrid    |          6 |
+| Khorad    |          1 |
+| Ibra      |          2 |
+| Tesciowa  |          5 |
+| Defgard   |         55 |
+| Bjolkolur |         12 |
+| Drozd     |          1 |
+| Szczeki   |          1 |
++-----------+------------+
+	#2.
+select kreatura.nazwa, zasob.nazwa from kreatura inner join ekwipunek ON kreatura.idKreatury=ekwipunek.idKreatury inner join zasob on ekwipunek.idZasobu=zasob.idZasobu;
+	#3. 
+	#left joinem
+select nazwa, ekwipunek.idKreatury from kreatura left join ekwipunek ON kreatura.idKreatury=ekwipunek.idKreatury where ekwipunek.idKreatury is Null;
++----------------------------+------------+
+| nazwa                      | idKreatury |
++----------------------------+------------+
+| Birgun                     |       NULL |
+| Nemo                       |       NULL |
+| Loko                       |       NULL |
+| Ara                        |       NULL |
+| Tiki                       |       NULL |
+| Dziadek                    |       NULL |
+| sztuczna szczeka tesciowej |       NULL |
+| Tesciowa dziadka           |       NULL |
+| Babajaga                   |       NULL |
++----------------------------+------------+
+	#podzapytaniem
+select idkreatury from kreatura where idKreatury not in
+(select idKreatury from ekwipunek where idKreatury is not null);
+
+#Zadanie 4
+	#1.
+#SELECT * from kreatura natural join ekwipunek; - normalnie nie uzywa sie natural joina, lepiej inner ,left itp.
+#select kreatura.nazwa from kreatura natural join ekwipunek natural join zasob where year(dataUr) between 1670 and 1679; - nie działa!!!!
+select kreatura.nazwa, zasob.nazwa from kreatura inner join ekwipunek ON kreatura.idKreatury=ekwipunek.idKreatury inner join zasob on ekwipunek.idZasobu=zasob.idZasobu where year(dataUr) between 1670 and 1679;
++-----------+---------------+
+| nazwa     | nazwa         |
++-----------+---------------+
+| Bjorn     | kokos         |
+| Bjorn     | stanik        |
+| Bjorn     | buty          |
+| Bjorn     | lisc palmowy  |
+| Bjorn     | siekiera      |
+| Brutal    | siekiera      |
+| Brutal    | kokos         |
+| Bjorn     | hamak         |
+| Bjorn     | topor         |
+| Astrid    | kokos         |
+| Khorad    | kiel slonia   |
+| Ibra      | skora geparda |
+| Ibra      | dzida         |
+| Astrid    | luk           |
+| Defgard   | kiel slonia   |
+| Bjolkolur | pnacza        |
+| Drozd     | stanik        |
+| Bjolkolur | deski         |
+| Szczeki   | opos          |
+| Defgard   | siekiera      |
+| Defgard   | pnacza        |
+| Defgard   | skora geparda |
+| Astrid    | stanik        |
++-----------+---------------+
+	#2.
+select kreatura.nazwa, zasob.nazwa, zasob.rodzaj from kreatura inner join ekwipunek ON kreatura.idKreatury=ekwipunek.idKreatury inner join zasob on ekwipunek.idZasobu=zasob.idZasobu where zasob.rodzaj='jedzenie' order by kreatura.dataUr DESC Limit 5;
++---------+-------+----------+
+| nazwa   | nazwa | rodzaj   |
++---------+-------+----------+
+| Astrid  | kokos | jedzenie |
+| Szczeki | opos  | jedzenie |
+| Brutal  | kokos | jedzenie |
+| Bjorn   | kokos | jedzenie |
++---------+-------+----------+
+	#3.
+SELECT concat(kreatura.nazwa,'-',kreatura1.nazwa) FROM kreatura, kreatura as kreatura1 WHERE kreatura.idKreatury=kreatura1.idKreatury AND kreatura.idKreatury=;
+
+
+DODATKOWE PUNKTY za 5 ZADANIE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
