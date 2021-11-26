@@ -621,12 +621,56 @@ SELECT concat(kreatura.nazwa,'-',kreatura1.nazwa) FROM kreatura, kreatura as kre
 
 DODATKOWE PUNKTY za 5 ZADANIE
 
-
-
-
-
-
-
+#Zadanie 5
+	#1.
+SELECT k.rodzaj, avg(e.ilosc * z.waga) FROM kreatura k
+inner join ekwipunek e on k.idKreatury=e.idKreatury
+inner join zasob z on e.idZasobu=z.idZasobu where k.rodzaj not in ('malpa','waz')
+and e.ilosc < 30 group by k.rodzaj;
++---------+-----------------------+
+| rodzaj  | avg(e.ilosc * z.waga) |
++---------+-----------------------+
+| wiking  |             10.505263 |
+| wiedzma |              3.500000 |
+| ptak    |              0.200000 |
+| ryba    |             12.000000 |
++---------+-----------------------+
+SELECT k.rodzaj, avg(e.ilosc * z.waga) FROM kreatura k
+inner join ekwipunek e on k.idKreatury=e.idKreatury
+inner join zasob z on e.idZasobu=z.idZasobu where k.rodzaj not in ('malpa','waz')
+group by k.rodzaj
+having sum(e.ilosc)<30;
+	#2.		#union
+#SELECT nazwa from kreatura
+#where rodzaj !="wiking"
+#union 
+#SELECT nazwa from kreatura
+#where rodzaj ="wiking";
+#SELECT rodzaj, max(dataUr) from kreatura group by rodzaj;
+SELECT nazwa, dataUr, rodzaj 
+from kreatura where dataUr in (select max(dataUr) from kreatura group by rodzaj)
+union
+SELECT nazwa, dataUr, rodzaj 
+from kreatura where dataUr in (select min(dataUr) from kreatura group by rodzaj);
++----------------------------+------------+---------+
+| nazwa                      | dataUr     | rodzaj  |
++----------------------------+------------+---------+
+| Astrid                     | 1677-08-18 | wiking  |
+| Nemo                       | 1677-10-02 | ryba    |
+| Loko                       | 1677-10-05 | waz     |
+| Ara                        | 1676-05-05 | ptak    |
+| Tiki                       | 1672-08-08 | malpa   |
+| sztuczna szczeka tesciowej | 1680-08-13 | wiedzma |
+| Drozd                      | 1675-07-07 | ptak    |
+| Szczeki                    | 1674-04-06 | ryba    |
+| Dziadek                    | 1645-01-23 | wiking  |
+| Babajaga                   | 1000-01-01 | wiedzma |
++----------------------------+------------+---------+
+	#albo
+#SELECT k.nazwa, k.dataUr, k.rodzaj
+#from kreatura k,
+#(select min(dataUr) as min, max(dataUr) as max from kreatura group by rodzaj) pod
+#where k.dataUr=pod.min or k.dataUr=pod.max;
 
 
 
