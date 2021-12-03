@@ -42,33 +42,34 @@ group by w.nazwa;
 | Poszukiwanie ziecia   |                 5 | Nemo,Tesciowa,Tiki,sztuczna szczeka tesciowej,Tesciowa dziadka |
 +-----------------------+-------------------+----------------------------------------------------------------+
 	#Zadanie 2.2
-SELECT w.nazwa, s.nazwa, k.nazwa from kreatura k
+SELECT w.nazwa, s.nazwa, ew.kolejnosc, k.nazwa from kreatura k
 inner join wyprawa w on k.idKreatury=w.kierownik
 inner join etapy_wyprawy ew on w.id_wyprawy=ew.idWyprawy
 inner join sektor s on ew.sektor=s.id_sektora
 order by w.data_rozpoczecia, ew.kolejnosc ASC;
-+-----------------------+--------------------+----------+
-| nazwa                 | nazwa              | nazwa    |
-+-----------------------+--------------------+----------+
-| Poszukiwanie ziecia   | Pieczara tesciowej | Tesciowa |
-| Nakarm kanibala       | Chatka dziadka     | Dziadek  |
-| Poszukiwanie ziecia   | Wulkan             | Tesciowa |
-| Nakarm kanibala       | Pieczara tesciowej | Dziadek  |
-| Poszukiwanie ziecia   | Wioska Kanibali    | Tesciowa |
-| Nakarm kanibala       | Zatoka rekinow     | Dziadek  |
-| Poszukiwanie ziecia   | Pieprzne pole      | Tesciowa |
-| Nakarm kanibala       | Wulkan             | Dziadek  |
-| Poszukiwanie ziecia   | Chatka dziadka     | Tesciowa |
-| Nakarm kanibala       | Wioska Kanibali    | Dziadek  |
-| Polowanie na tesciowa | Kokosowa plaza     | Bjorn    |
-| Polowanie na tesciowa | Chatka dziadka     | Bjorn    |
-| Polowanie na tesciowa | Wulkan             | Bjorn    |
-| Polowanie na tesciowa | Zatoka rekinow     | Bjorn    |
-| Polowanie na tesciowa | Pieczara tesciowej | Bjorn    |
-+-----------------------+--------------------+----------+
++-----------------------+--------------------+-----------+----------+
+| nazwa                 | nazwa              | kolejnosc | nazwa    |
++-----------------------+--------------------+-----------+----------+
+| Poszukiwanie ziecia   | Pieczara tesciowej |         1 | Tesciowa |
+| Nakarm kanibala       | Chatka dziadka     |         1 | Dziadek  |
+| Poszukiwanie ziecia   | Wulkan             |         2 | Tesciowa |
+| Nakarm kanibala       | Pieczara tesciowej |         2 | Dziadek  |
+| Poszukiwanie ziecia   | Wioska Kanibali    |         3 | Tesciowa |
+| Nakarm kanibala       | Zatoka rekinow     |         3 | Dziadek  |
+| Poszukiwanie ziecia   | Pieprzne pole      |         4 | Tesciowa |
+| Nakarm kanibala       | Wulkan             |         4 | Dziadek  |
+| Poszukiwanie ziecia   | Chatka dziadka     |         5 | Tesciowa |
+| Nakarm kanibala       | Wioska Kanibali    |         5 | Dziadek  |
+| Polowanie na tesciowa | Kokosowa plaza     |         1 | Bjorn    |
+| Polowanie na tesciowa | Chatka dziadka     |         2 | Bjorn    |
+| Polowanie na tesciowa | Wulkan             |         3 | Bjorn    |
+| Polowanie na tesciowa | Zatoka rekinow     |         4 | Bjorn    |
+| Polowanie na tesciowa | Pieczara tesciowej |         5 | Bjorn    |
++-----------------------+--------------------+-----------+----------+
+
 
 	#Zadanie 3.1
-SELECT s.nazwa, IFNULL(count(idWyprawy),0) 'ilosc odwiedzin' FROM sektor s
+SELECT s.nazwa, IFNULL(count(idWyprawy),0) as 'ilosc odwiedzin' FROM sektor s
 left join etapy_wyprawy ew on s.id_sektora=ew.sektor group by s.nazwa;
 +--------------------+-----------------+
 | nazwa              | ilosc odwiedzin |
@@ -83,6 +84,82 @@ left join etapy_wyprawy ew on s.id_sektora=ew.sektor group by s.nazwa;
 | Kokosowa plaza     |               1 |
 | Zatoka rekinow     |               2 |
 +--------------------+-----------------+
+
 	#Zadanie 3.2
-SELECT k.nazwa, IFNULL('Bral udzial w wyprawie', 'Nie brał udziału w wyprawie') FROM kreatura k
-left join uczestnicy u on k.idKreatury=u.id_uczestnika group by k.nazwa;
+SELECT distinct(k.nazwa), IF(u.id_wyprawy is null,'Nie bral udzialu w wyprawie', 'Bral udzial w wyprawie') as 'Czy bral udzial w wyprawie' FROM kreatura k
+left join uczestnicy u on k.idKreatury=u.id_uczestnika;
++----------------------------+-----------------------------+
+| nazwa                      | Czy bral udzial w wyprawie  |
++----------------------------+-----------------------------+
+| Bjorn                      | Bral udzial w wyprawie      |
+| Brutal                     | Nie bral udzialu w wyprawie |
+| Khorad                     | Bral udzial w wyprawie      |
+| Birgun                     | Bral udzial w wyprawie      |
+| Defgard                    | Nie bral udzialu w wyprawie |
+| Astrid                     | Bral udzial w wyprawie      |
+| Ibra                       | Bral udzial w wyprawie      |
+| Bjolkolur                  | Bral udzial w wyprawie      |
+| Nemo                       | Bral udzial w wyprawie      |
+| Loko                       | Bral udzial w wyprawie      |
+| Drozd                      | Bral udzial w wyprawie      |
+| Ara                        | Nie bral udzialu w wyprawie |
+| Szczeki                    | Bral udzial w wyprawie      |
+| Tesciowa                   | Bral udzial w wyprawie      |
+| Tiki                       | Bral udzial w wyprawie      |
+| Dziadek                    | Bral udzial w wyprawie      |
+| sztuczna szczeka tesciowej | Bral udzial w wyprawie      |
+| Tesciowa dziadka           | Bral udzial w wyprawie      |
+| Babajaga                   | Nie bral udzialu w wyprawie |
++----------------------------+-----------------------------+
+
+	#Zadanie 4.1
+SELECT w.nazwa, sum(length(ew.dziennik)) from wyprawa w
+inner join etapy_wyprawy ew on w.id_wyprawy=ew.idWyprawy group by w.nazwa having sum(length(ew.dziennik))<400;
++-----------------------+--------------------------+
+| nazwa                 | sum(length(ew.dziennik)) |
++-----------------------+--------------------------+
+| Poszukiwanie ziecia   |                      344 |
+| Polowanie na tesciowa |                      310 |
++-----------------------+--------------------------+
+	#Zadanie 4.2
+SELECT w.nazwa, (sum(z.waga*z.ilosc)/count(u.id_uczestnika)) as 'srednia waga zasobow' FROM wyprawa w
+inner join uczestnicy u on w.id_wyprawy=u.id_wyprawy
+inner join kreatura k on u.id_uczestnika=k.idKreatury
+inner join ekwipunek e on k.idKreatury=e.idKreatury
+inner join zasob z on e.idZasobu=z.idZasobu group by w.nazwa;
++-----------------------+----------------------+
+| nazwa                 | srednia waga zasobow |
++-----------------------+----------------------+
+| Poszukiwanie ziecia   |             3.250000 |
+| Polowanie na tesciowa |            37.636364 |
+| Nakarm kanibala       |            19.714286 |
++-----------------------+----------------------+
+
+	#Zadanie 5.1
+SELECT k.nazwa, datediff(w.data_rozpoczecia, k.dataUr)as 'ile ma dni' from kreatura k
+inner join uczestnicy u on k.idKreatury=u.id_uczestnika
+inner join wyprawa w on u.id_wyprawy=w.id_wyprawy
+inner join etapy_wyprawy ew on w.id_wyprawy=ew.idWyprawy
+inner join sektor s on ew.sektor=s.id_sektora where s.nazwa='chatka dziadka';
++----------------------------+------------+
+| nazwa                      | ile ma dni |
++----------------------------+------------+
+| Nemo                       |       8339 |
+| Tesciowa                   |      16376 |
+| Tiki                       |      10220 |
+| sztuczna szczeka tesciowej |       7293 |
+| Tesciowa dziadka           |      25661 |
+| Bjorn                      |      11082 |
+| Birgun                     |       9216 |
+| Ibra                       |       9678 |
+| Loko                       |       8338 |
+| Drozd                      |       9159 |
+| Szczeki                    |       9616 |
+| Dziadek                    |      20281 |
+| Bjorn                      |      11080 |
+| Khorad                     |      10610 |
+| Astrid                     |       8384 |
+| Bjolkolur                  |       8890 |
+| Drozd                      |       9157 |
+| Dziadek                    |      20279 |
++----------------------------+------------+
