@@ -88,6 +88,9 @@ left join etapy_wyprawy ew on s.id_sektora=ew.sektor group by s.nazwa;
 	#Zadanie 3.2
 SELECT distinct(k.nazwa), IF(u.id_wyprawy is null,'Nie bral udzialu w wyprawie', 'Bral udzial w wyprawie') as 'Czy bral udzial w wyprawie' FROM kreatura k
 left join uczestnicy u on k.idKreatury=u.id_uczestnika;
+		#ALBO
+SELECT k.nazwa, IF(count(u.id_wyprawy) >0,'Bral udzial w wyprawie', 'Nie bral udzialu w wyprawie') as 'Czy bral udzial w wyprawie' FROM kreatura k
+left join uczestnicy u on k.idKreatury=u.id_uczestnika group by k.nazwa;
 +----------------------------+-----------------------------+
 | nazwa                      | Czy bral udzial w wyprawie  |
 +----------------------------+-----------------------------+
