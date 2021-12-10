@@ -125,18 +125,24 @@ inner join etapy_wyprawy ew on w.id_wyprawy=ew.idWyprawy group by w.nazwa having
 | Polowanie na tesciowa |                      310 |
 +-----------------------+--------------------------+
 	#Zadanie 4.2
-SELECT w.nazwa, (sum(z.waga*z.ilosc)/count(u.id_uczestnika)) as 'srednia waga zasobow' FROM wyprawa w
-inner join uczestnicy u on w.id_wyprawy=u.id_wyprawy
-inner join kreatura k on u.id_uczestnika=k.idKreatury
-inner join ekwipunek e on k.idKreatury=e.idKreatury
-inner join zasob z on e.idZasobu=z.idZasobu group by w.nazwa;
-+-----------------------+----------------------+
-| nazwa                 | srednia waga zasobow |
-+-----------------------+----------------------+
-| Poszukiwanie ziecia   |             3.250000 |
-| Polowanie na tesciowa |            37.636364 |
-| Nakarm kanibala       |            19.714286 |
-+-----------------------+----------------------+
+	#TO JEST ZLE
+SELECT w.nazwa, sum(z.waga*z.ilosc), count(u.id_uczestnika),(sum(z.waga*z.ilosc)/count(u.id_uczestnika)) as 'srednia waga zasobow' FROM wyprawa w
+left join uczestnicy u on w.id_wyprawy=u.id_wyprawy
+left join kreatura k on u.id_uczestnika=k.idKreatury
+left join ekwipunek e on k.idKreatury=e.idKreatury
+left join zasob z on e.idZasobu=z.idZasobu group by w.nazwa;
+	#TO JUZ NIE
+SELECT  u.id_Wyprawy, (sum(z.waga*e.ilosc)/count(distinct u.id_uczestnika)) as 'srednia waga zasobow' FROM uczestnicy u
+left join ekwipunek e on u.id_uczestnika=e.idKreatury
+left join zasob z on z.idZasobu=e.idZasobu group by u.id_wyprawy;
+	#mozna dodac round(jakieswierwsze,2)  - do 2 liczb po ','
++------------+----------------------+
+| id_Wyprawy | srednia waga zasobow |
++------------+----------------------+
+|          1 |             2.800000 |
+|          2 |            14.814286 |
+|          3 |            12.516667 |
++------------+----------------------+
 
 	#Zadanie 5.1
 SELECT k.nazwa, datediff(w.data_rozpoczecia, k.dataUr)as 'ile ma dni' from kreatura k
